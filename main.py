@@ -1,5 +1,6 @@
 import numpy as np
 from game2dboard import Board
+from tkinter import messagebox
 
 NUM_ROWS = 20
 NUM_COLS = 20
@@ -33,13 +34,13 @@ def take_action(state, action):
         # right
         next_state = (state[0] + 1, state[1])
     elif action == 1:
-        # down
+        # up
         next_state = (state[0], state[1] - 1)
     elif action == 2:
         # left
         next_state = (state[0] - 1, state[1])
     elif action == 3:
-        # up
+        # down
         next_state = (state[0], state[1] + 1)
     else:
         print("this is not good this is not good")
@@ -49,6 +50,7 @@ def take_action(state, action):
         if (next_state[1] >= 0) and (next_state[1] <= NUM_COLS - 1):
             if next_state not in obstacle_states:
                 return next_state
+    print("NOT GOOD")
     return state
 
 
@@ -106,10 +108,21 @@ def plan_actions(q_table):
     previous_state = START_STATE
     for x in range(NUM_ROWS):
         for y in range(NUM_COLS):
-            q_table[x][y] = calc_best_action([y, x], previous_state)
+            q_table[x][y] = calc_best_action([x, y], previous_state)
             previous_state = current_state
-            current_state = [y, x]
+            current_state = [x, y]
     return q_table
+
+
+def generate_board(display):
+    display.cell_size = 25
+    display.title = "IQL Algorithm"
+    display.cursor = None
+    display.margin = 10
+    display.grid_color = "black"
+    display.margin_color = "grey"
+    display.cell_color = "white"
+    display.fill(None)
 
 
 def main():
@@ -121,17 +134,23 @@ def main():
     # TRAVEL PHASE (following the path & displaying result)
     # first, generate board
     display = Board(NUM_COLS, NUM_ROWS)
-    display.cell_size = 25
-    display.title = "IQL Algorithm"
-    display.cursor = None
-    display.margin = 10
-    display.grid_color = "blue"
-    display.margin_color = "green"
-    display.cell_color = "yellow"
-
-
-
-
+    generate_board(display)
+    for x in range(NUM_ROWS):
+        for y in range(NUM_COLS):
+            if q_table[x][y] == 0:
+                display[y][x] = 'right_arrow'
+            elif q_table[x][y] == 1:
+                display[y][x] = 'up_arrow'
+            elif q_table[x][y] == 2:
+                display[y][x] = 'left_arrow'
+            elif q_table[x][y] == 3:
+                display[y][x] = 'down_arrow'
+            if (x, y) in obstacle_states:
+                display[x][y] = 'spike_pit'
+            if [y, x] == GOAL_STATE:
+                display[x][y] = 'treasure_chest'
+    display.show()
+    print(display)
 
 
 if __name__ == '__main__':
