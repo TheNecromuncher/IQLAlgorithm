@@ -4,6 +4,7 @@ from tkinter import messagebox
 
 NUM_ROWS = 20
 NUM_COLS = 20
+display = Board(NUM_COLS, NUM_ROWS)
 GOAL_STATE = [0, NUM_COLS - 1]
 START_STATE = [NUM_ROWS - 1, 0]
 
@@ -114,7 +115,7 @@ def plan_actions(q_table):
     return q_table
 
 
-def generate_board(display):
+def generate_board():
     display.cell_size = 25
     display.title = "IQL Algorithm"
     display.cursor = None
@@ -125,6 +126,27 @@ def generate_board(display):
     display.fill(None)
 
 
+def display_grid(state, action):
+    x = state[0]
+    y = state[1]
+    if [y, x] == GOAL_STATE:
+        display[x][y] = 'treasure_chest'
+    if [y, x] == START_STATE:
+        display[x][y] = 'dwarf'
+    if (x, y) in obstacle_states:
+        display[x][y] = 'spike_pit'
+    if action == 0:
+        display[y][x] = 'right_arrow'
+    elif action == 1:
+        display[y][x] = 'up_arrow'
+    elif action == 2:
+        display[y][x] = 'left_arrow'
+    elif action == 3:
+        display[y][x] = 'down_arrow'
+    if (x, y) in obstacle_states:
+        display[x][y] = 'spike_pit'
+
+
 def main():
     # INITIALIZATION PHASE
     q_table = generate_q_table()
@@ -133,10 +155,15 @@ def main():
     print(q_table)
     # TRAVEL PHASE (following the path & displaying result)
     # first, generate board
-    display = Board(NUM_COLS, NUM_ROWS)
-    generate_board(display)
+    generate_board()
     for x in range(NUM_ROWS):
         for y in range(NUM_COLS):
+            if [y, x] == GOAL_STATE:
+                display[x][y] = 'treasure_chest'
+            if [y, x] == START_STATE:
+                display[x][y] = 'dwarf'
+            if (x, y) in obstacle_states:
+                display[x][y] = 'spike_pit'
             if q_table[x][y] == 0:
                 display[y][x] = 'right_arrow'
             elif q_table[x][y] == 1:
@@ -147,8 +174,7 @@ def main():
                 display[y][x] = 'down_arrow'
             if (x, y) in obstacle_states:
                 display[x][y] = 'spike_pit'
-            if [y, x] == GOAL_STATE:
-                display[x][y] = 'treasure_chest'
+
     display.show()
     print(display)
 
