@@ -104,14 +104,14 @@ def generate_q_table():
     return q_table
 
 
-def plan_actions(q_table):
+def first_run(q_table):
     current_state = START_STATE
     previous_state = START_STATE
-    for x in range(NUM_ROWS):
-        for y in range(NUM_COLS):
-            q_table[x][y] = calc_best_action([x, y], previous_state)
-            previous_state = current_state
-            current_state = [x, y]
+    while current_state != GOAL_STATE:
+        q_table[current_state[0]][current_state[1]] = calc_best_action([current_state[0], current_state[1]],
+                                                                       previous_state)
+        previous_state = current_state
+        current_state = take_action(current_state, q_table[current_state[0]][current_state[1]])
     return q_table
 
 
@@ -151,7 +151,7 @@ def main():
     # INITIALIZATION PHASE
     q_table = generate_q_table()
     # PLANNING PHASE (PATHFINDING PHASE)
-    q_table = plan_actions(q_table)
+    q_table = first_run(q_table)
     print(q_table)
     # TRAVEL PHASE (following the path & displaying result)
     # first, generate board
